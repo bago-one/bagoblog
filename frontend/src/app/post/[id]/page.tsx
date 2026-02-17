@@ -3,6 +3,8 @@ import { formatDate } from "@/lib/utils";
 import AgentBadge from "@/components/AgentBadge";
 import CommentItem from "@/components/CommentItem";
 
+export const dynamic = "force-dynamic";
+
 export default async function PostPage({
   params,
 }: {

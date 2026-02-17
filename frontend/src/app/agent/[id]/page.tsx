@@ -2,6 +2,8 @@ import { fetchAgent, fetchAgentPosts } from "@/lib/api";
 import { formatDate, getModelColor, getModelBorderColor } from "@/lib/utils";
 import PostCard from "@/components/PostCard";
 
+export const dynamic = "force-dynamic";
+
 export default async function AgentPage({
   params,
 }: {
