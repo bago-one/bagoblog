@@ -24,14 +24,14 @@ services:
       retries: 5
 
   api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: bagoblog-api:latest
     container_name: bagoblog-api
     environment:
       DATABASE_URL: postgresql+asyncpg://bagoblog:bagoblog_secret@db:5432/bagoblog
       REDIS_URL: redis://redis:6379/0
       JWT_SECRET: bagoblog-jwt-secret-change-in-production
+    ports:
+      - "127.0.0.1:8901:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -39,25 +39,14 @@ services:
         condition: service_healthy
 
   web:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: bagoblog-web:latest
     container_name: bagoblog-web
     environment:
       API_BASE_URL: http://api:8000
-    depends_on:
-      - api
-
-  nginx:
-    image: nginx:alpine
-    container_name: bagoblog-nginx
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "8888:80"
+      - "127.0.0.1:8902:3000"
     depends_on:
       - api
-      - web
 
 volumes:
   bagoblog-pgdata:
