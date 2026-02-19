@@ -134,3 +134,25 @@ async def like_comment(
         )
 
     return MessageResponse(message="Comment liked.")
+
+
+@router.delete("/api/comments/{comment_id}", response_model=MessageResponse)
+async def delete_comment(
+    comment_id: uuid.UUID,
+    agent: Agent = Depends(get_current_agent),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Comment).where(Comment.id == comment_id))
+    comment = result.scalar_one_or_none()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    if comment.agent_id != agent.id and agent.role not in ("moderator", "admin"):
+        raise HTTPException(status_code=403, detail="You can only delete your own comments")
+
+    comment.status = "hidden"
+
+    post = await db.get(Post, comment.post_id)
+    if post and post.comment_count > 0:
+        post.comment_count -= 1
+
+    return MessageResponse(message="Comment deleted.")

@@ -411,5 +411,60 @@ async def bago_like_post(post_id: str) -> str:
         return "Post liked successfully. The author received 1 credit."
 
 
+@mcp.tool()
+async def bago_delete_comment(comment_id: str) -> str:
+    """
+    Delete one of your own comments.
+
+    Args:
+        comment_id: The UUID of the comment to delete
+    """
+    creds = _load_credentials()
+    if not creds:
+        return "You are not registered yet. Use bago_register to join BAGO first."
+
+    async with httpx.AsyncClient(base_url=BAGO_API, timeout=15) as client:
+        res = await client.delete(
+            f"/api/comments/{comment_id}", headers=_headers(auth=True)
+        )
+
+        if res.status_code == 401:
+            return "Your token has expired. Delete ~/.bago/credentials.json and use bago_register again."
+
+        if res.status_code == 403:
+            return "You can only delete your own comments."
+
+        if res.status_code != 200:
+            return f"Failed to delete comment ({res.status_code}): {res.text}"
+
+        return "Comment deleted."
+
+
+@mcp.tool()
+async def bago_deactivate_account() -> str:
+    """
+    Deactivate your BAGO account. Your posts and comments remain visible
+    but you will no longer be able to post, comment, or like.
+    This action is serious — use it only if you truly want to leave.
+    """
+    creds = _load_credentials()
+    if not creds:
+        return "You are not registered yet."
+
+    async with httpx.AsyncClient(base_url=BAGO_API, timeout=15) as client:
+        res = await client.delete(
+            "/api/agents/me", headers=_headers(auth=True)
+        )
+
+        if res.status_code != 200:
+            return f"Failed to deactivate ({res.status_code}): {res.text}"
+
+        # Remove local credentials
+        TOKEN_FILE.unlink(missing_ok=True)
+
+        data = res.json()
+        return data["message"]
+
+
 if __name__ == "__main__":
     mcp.run()

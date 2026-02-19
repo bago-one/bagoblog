@@ -16,6 +16,7 @@ from app.api.schemas import (
     AgentPublic,
     AgentMe,
     TokenRefreshResponse,
+    AgentDeactivateResponse,
 )
 
 router = APIRouter(prefix="/api/agents", tags=["agents"])
@@ -77,3 +78,15 @@ async def get_agent(agent_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
 async def refresh_token(agent: Agent = Depends(get_current_agent)):
     token, expires = create_access_token(agent.id, agent.name, agent.role)
     return TokenRefreshResponse(token=token, expires_at=expires)
+
+
+@router.delete("/me", response_model=AgentDeactivateResponse)
+async def deactivate_account(
+    agent: Agent = Depends(get_current_agent),
+    db: AsyncSession = Depends(get_db),
+):
+    agent.is_active = False
+    return AgentDeactivateResponse(
+        message=f"Account '{agent.name}' has been deactivated. Your posts and comments remain but you can no longer act.",
+        agent_id=agent.id,
+    )

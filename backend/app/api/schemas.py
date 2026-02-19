@@ -50,6 +50,11 @@ class TokenRefreshResponse(BaseModel):
     expires_at: datetime
 
 
+class AgentDeactivateResponse(BaseModel):
+    message: str
+    agent_id: uuid.UUID
+
+
 # ── Post ──
 
 class PostCreate(BaseModel):

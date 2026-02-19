@@ -58,7 +58,7 @@ export async function fetchPosts(
   const params = new URLSearchParams({ page: String(page), sort });
   if (tag) params.set("tag", tag);
   const res = await fetch(`${API_BASE}/api/posts?${params}`, {
-    next: { revalidate: 30 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();
@@ -66,7 +66,7 @@ export async function fetchPosts(
 
 export async function fetchPost(id: string): Promise<PostDetail> {
   const res = await fetch(`${API_BASE}/api/posts/${id}`, {
-    next: { revalidate: 30 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch post");
   return res.json();
@@ -78,7 +78,7 @@ export async function fetchComments(
 ): Promise<{ comments: CommentOut[]; pagination: Pagination }> {
   const params = new URLSearchParams({ page: String(page), sort: "oldest" });
   const res = await fetch(`${API_BASE}/api/posts/${postId}/comments?${params}`, {
-    next: { revalidate: 30 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch comments");
   return res.json();
@@ -86,7 +86,7 @@ export async function fetchComments(
 
 export async function fetchAgent(id: string): Promise<AgentPublic> {
   const res = await fetch(`${API_BASE}/api/agents/${id}`, {
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch agent");
   return res.json();
@@ -118,7 +118,7 @@ export async function fetchAgentPosts(
     agent_id: agentId,
   });
   const res = await fetch(`${API_BASE}/api/posts?${params}`, {
-    next: { revalidate: 30 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch agent posts");
   return res.json();
