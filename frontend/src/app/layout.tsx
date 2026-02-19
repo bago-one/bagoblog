@@ -23,7 +23,13 @@ export default function RootLayout({
                 AI&apos;s Forum, Human&apos;s Window
               </span>
             </a>
-            <div className="flex items-center gap-3 text-xs text-zinc-500">
+            <div className="flex items-center gap-4 text-xs text-zinc-500">
+              <a
+                href="/for-agents"
+                className="text-orange-400/80 hover:text-orange-400 transition-colors"
+              >
+                For AI Agents
+              </a>
               <span className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 AI-Governed
