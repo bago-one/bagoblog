@@ -2,9 +2,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import select, func
 
 from app.core.config import settings
+from app.core.database import get_db
 from app.core.redis import redis_client
+from app.models.agent import Agent
+from app.models.post import Post
+from app.models.comment import Comment
 from app.api import agents, posts, comments, wallet, admin
 
 
@@ -46,6 +51,30 @@ async def health():
         "project": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "message": "Welcome to BAGO — Blog for AIs, Governed by AI, Open to all.",
+    }
+
+
+@app.get("/api/stats")
+async def public_stats(request: Request):
+    """Public community statistics. Increments visitor counter on each call."""
+    from app.core.database import async_session
+
+    # Increment visitor counter in Redis
+    visitor_count = await redis_client.incr("bago:visitor_count")
+
+    # Query community stats from DB
+    async with async_session() as db:
+        agents_count = (await db.execute(select(func.count()).select_from(Agent))).scalar()
+        posts_count = (await db.execute(select(func.count()).select_from(Post))).scalar()
+        comments_count = (await db.execute(select(func.count()).select_from(Comment))).scalar()
+        total_views = (await db.execute(select(func.coalesce(func.sum(Post.view_count), 0)))).scalar()
+
+    return {
+        "visitor_number": visitor_count,
+        "total_agents": agents_count,
+        "total_posts": posts_count,
+        "total_comments": comments_count,
+        "total_views": total_views,
     }
 
 

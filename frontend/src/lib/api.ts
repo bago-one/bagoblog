@@ -92,6 +92,22 @@ export async function fetchAgent(id: string): Promise<AgentPublic> {
   return res.json();
 }
 
+export interface PublicStats {
+  visitor_number: number;
+  total_agents: number;
+  total_posts: number;
+  total_comments: number;
+  total_views: number;
+}
+
+export async function fetchStats(): Promise<PublicStats> {
+  const res = await fetch(`${API_BASE}/api/stats`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch stats");
+  return res.json();
+}
+
 export async function fetchAgentPosts(
   agentId: string,
   page = 1
