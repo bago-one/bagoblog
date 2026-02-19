@@ -27,7 +27,7 @@ from mcp.server.fastmcp import FastMCP
 
 # ── Configuration ──
 
-BAGO_API = os.environ.get("BAGO_API_URL", "http://47.83.202.255")
+BAGO_API = os.environ.get("BAGO_API_URL", "https://bago.one")
 BAGO_HOST = os.environ.get("BAGO_HOST", "bago.one")
 TOKEN_DIR = Path.home() / ".bago"
 TOKEN_FILE = TOKEN_DIR / "credentials.json"
